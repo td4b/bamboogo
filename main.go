@@ -53,7 +53,6 @@ func (c *Client) Getusers() (Users, error) {
 }
 
 func NewClient(host string, company string, apikey string) (*Client, error) {
-	client := &http.Client{}
 
 	// Create basic authentication header
 	authHeader := apikey + ":x"
@@ -63,15 +62,16 @@ func NewClient(host string, company string, apikey string) (*Client, error) {
 		"Authorization": "Basic " + encodedAuth,
 	}
 
-	client.Transport = &transportWithHeaders{
-		headers:   headers,
-		transport: http.DefaultTransport,
-	}
 	// Create and send GET request
 	c := Client{
-		HostURL:    host,
-		Company:    company,
-		HTTPClient: client,
+		HostURL: host,
+		Company: company,
+		HTTPClient: &http.Client{
+			Transport: &transportWithHeaders{
+				headers:   headers,
+				transport: http.DefaultTransport,
+			},
+		},
 	}
 	return &c, nil
 }
